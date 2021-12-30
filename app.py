@@ -1,6 +1,6 @@
-from os import path, listdir, getenv as env
+from os import unlink, isfile, path, listdir, getenv as env
 from dotenv import load_dotenv
-from shutil import move
+from shutil import copy2 as copy
 
 load_dotenv()
 
@@ -10,6 +10,19 @@ allowed_extensions = tuple(['.' + i.lower() for i in env('ALLOWED_EXTENSIONS').s
 
 local_media = listdir(source)
 
-for file in local_media:
-    if file.endswith(allowed_extensions):
-        move(path.join(source, file), target)
+def copy_to_target():
+    for item in local_media:
+        try:
+            if item.endswith(allowed_extensions):
+                copy(path.join(source, item), target)
+        except Exception as e:
+            print(f'Failed to copy {item}. Reason: {e}.')
+
+def purge_source():
+    for i in local_media:
+        item = path.join(source, file)
+        try:
+            if path.isfile(item) and file.endswith(allowed_extensions):
+                os.unlink(item)
+        except Exception as e:
+            print(f'Failed to delete {item}. Reason: {e}.')
